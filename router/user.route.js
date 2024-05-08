@@ -7,7 +7,7 @@ var userController = new user_controller_1.UserController();
 var router = (0, express_1.Router)();
 router.post('/signup', userController.createUser);
 router.post('/login', userController.login);
-router.get('/protected', auth_middleware_1.authenticateToken, function (req, res) {
+router.get('/protected', auth_middleware_1.anyLogedIn, function (req, res) {
     res.status(200).json({ message: 'Protected route', user: req.user.role });
 });
 exports.default = router;

@@ -14,9 +14,9 @@ var port = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //Routes
-app.use('/author', author_route_1.default);
-app.use('/category', category_route_1.default);
-app.use('/book', auth_middleware_1.authenticateToken, book_route_1.default);
+app.use('/author', auth_middleware_1.adminOnly, author_route_1.default);
+app.use('/category', auth_middleware_1.adminOnly, category_route_1.default);
+app.use('/book', book_route_1.default);
 app.use('/user', user_route_1.default);
 app.get('/', function (req, res) {
     res.send('Hello World!');

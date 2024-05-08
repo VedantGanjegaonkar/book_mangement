@@ -6,7 +6,7 @@ import categoryRoute from './router/category.route'
 import bookRoute from './router/book.route'
 import userRoute from './router/user.route'
 
-import { authenticateToken } from './middleware/auth.middleware';
+import { adminOnly } from './middleware/auth.middleware';
 
 
 const app = express()
@@ -20,9 +20,9 @@ app.use(express.urlencoded({ extended: false }));
 
 
 //Routes
-app.use('/author',authorRoute)
-app.use('/category',categoryRoute)
-app.use('/book',authenticateToken,bookRoute)
+app.use('/author',adminOnly,authorRoute)
+app.use('/category',adminOnly,categoryRoute)
+app.use('/book',bookRoute)
 app.use('/user',userRoute)
 
 

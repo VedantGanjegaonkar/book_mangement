@@ -2,11 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var book_controler_1 = require("../controler/book.controler");
+var auth_middleware_1 = require("../middleware/auth.middleware");
 var categoryController = new book_controler_1.BookController();
 var router = (0, express_1.Router)();
-router.post('/create', categoryController.createBook);
-router.delete('/delete/:id', categoryController.deleteBook);
-router.put('/update/:id', categoryController.updateBook);
-router.get('/', categoryController.getAllBooks);
-router.get('/get/:id', categoryController.getBookById);
+router.post('/create', auth_middleware_1.adminOnly, categoryController.createBook);
+router.delete('/delete/:id', auth_middleware_1.adminOnly, categoryController.deleteBook);
+router.put('/update/:id', auth_middleware_1.adminOnly, categoryController.updateBook);
+router.get('/all', auth_middleware_1.anyLogedIn, categoryController.getAllBooks);
+router.get('/get/:id', auth_middleware_1.anyLogedIn, categoryController.getBookById);
 exports.default = router;
