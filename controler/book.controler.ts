@@ -16,7 +16,7 @@ export class BookController {
                 price
             });
             res.status(201).json({ message: 'Book created successfully', book: newBook });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to create book', error: err.message });
         }
     }
@@ -30,7 +30,7 @@ export class BookController {
             }
             await BookModel.deleteOne({ _id: bookId });
             res.status(200).json({ message: 'Book deleted successfully' });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to delete book', error: err.message });
         }
     }
@@ -52,7 +52,7 @@ export class BookController {
             }
 
             res.status(200).json({ message: 'Book updated successfully', book: updatedBook });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to update book', error: err.message });
         }
     }
@@ -61,11 +61,11 @@ export class BookController {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
         const skip = (page - 1) * limit;
-        const searchQuery = req.query.search as string;
-        const category = req.query.category as string;
-        const author = req.query.author as string;
+        const searchQuery : string = req.query.search as string;
+        const category : any = req.query.category as string;
+        const author : any = req.query.author as string;
 
-        let query = {};
+        let query : any = {};
         if (searchQuery) {
             const authorIdRegex = /^[0-9a-fA-F]{24}$/; // Regex pattern for a valid ObjectId
             if (authorIdRegex.test(searchQuery)) {
@@ -91,7 +91,7 @@ export class BookController {
                                      .limit(limit);
 
         res.status(200).json({ books });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to fetch books', error: err.message });
         }
     }
@@ -105,7 +105,7 @@ export class BookController {
                 return;
             }
             res.status(200).json({ book });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to fetch book', error: err.message });
         }
     }

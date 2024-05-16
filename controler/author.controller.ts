@@ -11,7 +11,7 @@ class AuthorController {
                 nationality
             });
             res.status(201).json({ message: 'Author created successfully', author });
-        } catch (err) {
+        } catch (err: any) {
             res.status(500).json({ message: 'Failed to create author', error: err.message });
         }
     }
@@ -26,7 +26,7 @@ class AuthorController {
             }
             await AuthorModel.deleteOne({ _id: authorId });
             res.status(200).json({ message: 'Author deleted successfully' });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to delete author', error: err.message });
         }
     }
@@ -48,7 +48,7 @@ class AuthorController {
             }
 
             res.status(200).json({ message: 'Author updated successfully', author: updatedAuthor });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to update author', error: err.message });
         }
     }
@@ -59,7 +59,7 @@ class AuthorController {
             const authors=await AuthorModel.find({})
             res.status(200).json(authors)
             
-        } catch (error) {
+        } catch (error : any) {
             res.status(500).json({ message: 'Failed to get author', error: error.message });
         }
     }

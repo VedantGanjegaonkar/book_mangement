@@ -1,30 +1,25 @@
 // services/user.service.ts  book 
-import { Request, Response } from 'express';
-import { UserDocument } from '../model/user.model';
+import { UserDocument,UserModel } from '../model/user.model';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
-import { setId } from './auth.services';
 
-import { userQuery } from '../query/user.query'; 
 
-class AuthService {
-    private userQueryObj:userQuery;
-    constructor(){
-        this.userQueryObj=new userQuery()
+export class AuthService {
+   
+ 
+   public async findUserByEmail(email: string): Promise<UserDocument | null> {
+        console.log(email)
+        return await UserModel.findOne({ email });
     }
-
-    public async handleUserLogin(req: Request, res: Response): Promise<void> {
-        const { email, password } = req.body;
-        const user: UserDocument | null = await this.userQueryObj.findByemailAndPassword(email,password)
-        if (!user) {
-            res.status(400).json({ message: 'Invalid credentials' });
-            return;
-        }
-
-        const token: string = setId(user);
-        
-        console.log(token)
-        
+    
+    public async validatePassword(candidatePassword: string, hashedPassword: string): Promise<boolean> {
+        return await bcrypt.compare(candidatePassword, hashedPassword);
+    }
+    
+    public  generateAuthToken(userId: string, role: string): string {
+        return jwt.sign({ userId, role }, 'secret', { expiresIn: '1h' });
     }
 }
 
-export { AuthService };
+// export { AuthService };

@@ -1,4 +1,4 @@
-import * as express from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 // import * as cookieParser from 'cookie-parser'; 
 import authorRoute from './router/author.route'
@@ -25,10 +25,6 @@ app.use('/category',adminOnly,categoryRoute)
 app.use('/book',bookRoute)
 app.use('/user',userRoute)
 
-
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
 
 
 

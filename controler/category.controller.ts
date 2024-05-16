@@ -17,7 +17,7 @@ export class CategoryController {
             const newCategory: ICategory = await CategoryModel.create({ name });
 
             res.status(201).json({ message: 'Category created successfully', category: newCategory });
-        } catch (err) {
+        } catch (err : any) {
             res.status(500).json({ message: 'Failed to create category', error: err.message });
         }
     }
