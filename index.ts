@@ -6,6 +6,7 @@ import categoryRoute from './router/category.route'
 import bookRoute from './router/book.route'
 import userRoute from './router/user.route'
 
+
 import { adminOnly } from './middleware/auth.middleware';
 
 
@@ -24,6 +25,8 @@ app.use('/author',adminOnly,authorRoute)
 app.use('/category',adminOnly,categoryRoute)
 app.use('/book',bookRoute)
 app.use('/user',userRoute)
+
+
 
 
 
