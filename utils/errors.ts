@@ -18,8 +18,6 @@ export class AppError extends Error {
 
 
 
-
-
 export class NotFoundError extends AppError {
     constructor(message: string = 'Resource not found') {
         super(message, 404);
@@ -28,6 +26,7 @@ export class NotFoundError extends AppError {
 
 export class ValidationError extends AppError {
     constructor(message: string = 'Validation failed') {
+        
         super(message, 400);
     }
 }

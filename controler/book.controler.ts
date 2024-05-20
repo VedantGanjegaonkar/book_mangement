@@ -1,112 +1,79 @@
-import { Request, Response } from 'express';
+import { Request, Response,NextFunction } from 'express';
 import { BookModel } from '../model/book.model';
 import { ObjectId } from 'mongodb';
-
+import{bookServices} from '../services/book.services'
+import{errorHandler} from "../middleware/errorHandler"
 
 export class BookController {
-    public async createBook(req: Request, res: Response): Promise<void> {
+
+    private bookservice:bookServices;
+
+    constructor(){
+        this.bookservice=new bookServices()
+
+        this.createBook=this.createBook.bind(this)
+        this.deleteBook=this.deleteBook.bind(this)
+        this.updateBook=this.updateBook.bind(this)
+        this.getAllBooks=this.getAllBooks.bind(this)
+    }
+
+    public async createBook(req: Request, res: Response, next:NextFunction): Promise<void> {
         try {
             const { title, author, category, ISBN, description, price } = req.body;
-            const newBook = await BookModel.create({
-                title,
-                author,
-                category,
-                ISBN,
-                description,
-                price
-            });
+            const params= {title, author, category, ISBN, description, price }
+
+            const newBook=await this.bookservice.createBook(params)
+            
             res.status(201).json({ message: 'Book created successfully', book: newBook });
         } catch (err : any) {
-            res.status(500).json({ message: 'Failed to create book', error: err.message });
+            errorHandler(err,req,res,next)
+           
         }
     }
-    public async deleteBook(req: Request, res: Response): Promise<void> {
+    public async deleteBook(req: Request, res: Response,next:NextFunction): Promise<void> {
         try {
             const bookId = req.params.id;
-            const book = await BookModel.findById(bookId);
-            if (!book) {
-                res.status(404).json({ message: 'Book not found' });
-                return;
-            }
-            await BookModel.deleteOne({ _id: bookId });
+
+            await this.bookservice.deleteBook(bookId)
+
+
             res.status(200).json({ message: 'Book deleted successfully' });
         } catch (err : any) {
-            res.status(500).json({ message: 'Failed to delete book', error: err.message });
+            errorHandler(err,req,res,next)
         }
     }
 
-    public async updateBook(req: Request, res: Response): Promise<void> {
+    public async updateBook(req: Request, res: Response,next:NextFunction): Promise<void> {
         try {
             const bookId = req.params.id;
             const { title, author, category, ISBN, description, price } = req.body;
+            const params= {title, author, category, ISBN, description, price }
 
-            const updatedBook = await BookModel.findByIdAndUpdate(
-                bookId,
-                { title, author, category, ISBN, description, price },
-                { new: true }
-            );
-
-            if (!updatedBook) {
-                res.status(404).json({ message: 'Book not found' });
-                return;
-            }
+            const updatedBook=await this.bookservice.updateBook(bookId,params)
 
             res.status(200).json({ message: 'Book updated successfully', book: updatedBook });
+
         } catch (err : any) {
-            res.status(500).json({ message: 'Failed to update book', error: err.message });
+            errorHandler(err,req,res,next)
+            
         }
     }
-    public async getAllBooks(req: Request, res: Response): Promise<void> {
+    public async getAllBooks(req: Request, res: Response,next:NextFunction): Promise<void> {
         try {
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
-        const skip = (page - 1) * limit;
-        const searchQuery : string = req.query.search as string;
-        const category : any = req.query.category as string;
-        const author : any = req.query.author as string;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const searchQuery: string = req.query.search as string;
+            const category: any = req.query.category as string;
+            const author: any = req.query.author as string;
 
-        let query : any = {};
-        if (searchQuery) {
-            const authorIdRegex = /^[0-9a-fA-F]{24}$/; // Regex pattern for a valid ObjectId
-            if (authorIdRegex.test(searchQuery)) {
-                query = {
-                    $or: [
-                        { title: { $regex: new RegExp(searchQuery, 'i') } },
-                        { author: new ObjectId(searchQuery) }
-                    ]
-                };
-            } else {
-                query = { title: { $regex: new RegExp(searchQuery, 'i') } };
-            }
-        }
-        if (category) {
-            query['category'] = new ObjectId(category);
-        }
-        if (author) {
-            query['author'] = new ObjectId(author);
-        }
-
-        const books = await BookModel.find(query)
-                                     .skip(skip)
-                                     .limit(limit);
-
-        res.status(200).json({ books });
-        } catch (err : any) {
-            res.status(500).json({ message: 'Failed to fetch books', error: err.message });
+            const books = await this.bookservice.getAllBooksService({ page, limit, searchQuery, category, author });
+            
+          
+            res.status(200).json({ books });
+        } catch (err: any) {
+            errorHandler(err,req,res,next)
         }
     }
     
-    public async getBookById(req: Request, res: Response): Promise<void> {
-        try {
-            const bookId = req.params.id;
-            const book = await BookModel.findById(bookId);
-            if (!book) {
-                res.status(404).json({ message: 'Book not found' });
-                return;
-            }
-            res.status(200).json({ book });
-        } catch (err : any) {
-            res.status(500).json({ message: 'Failed to fetch book', error: err.message });
-        }
-    }
+    
 }

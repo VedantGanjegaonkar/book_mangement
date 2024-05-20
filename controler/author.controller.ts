@@ -1,7 +1,28 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { AuthorModel, IAuthor } from '../model/author.model';
-
+import { authorServices } from '../services/author.service';
+import{errorHandler} from "../middleware/errorHandler"
 class AuthorController {
+    private authorServices:authorServices;
+
+    constructor(){
+        this.authorServices=new authorServices()
+        this.deleteAuthor=this.deleteAuthor.bind(this)
+    }
+
+    
+    public async deleteAuthor(req: Request, res: Response,next:NextFunction): Promise<void> { 
+        try {
+            const authorId = req.params.id;
+
+            await this.authorServices.deleteAuther(authorId)
+            
+            res.status(200).json({ message: 'Author and his books deleted successfully' });
+        } catch (err : any) {
+            errorHandler(err,req,res,next)
+        }
+    }
+
     public async createAuthor(req: Request, res: Response): Promise<void> {
         try {
             const { name, biography, nationality } = req.body;
@@ -16,20 +37,6 @@ class AuthorController {
         }
     }
 
-    public async deleteAuthor(req: Request, res: Response): Promise<void> { 
-        try {
-            const authorId = req.params.id;
-            const author = await AuthorModel.findById(authorId);
-            if (!author) {
-                res.status(404).json({ message: 'Author not found' });
-                return;
-            }
-            await AuthorModel.deleteOne({ _id: authorId });
-            res.status(200).json({ message: 'Author deleted successfully' });
-        } catch (err : any) {
-            res.status(500).json({ message: 'Failed to delete author', error: err.message });
-        }
-    }
 
     public async updateAuthor(req: Request, res: Response): Promise<void> {
         try {

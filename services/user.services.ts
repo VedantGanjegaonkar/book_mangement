@@ -1,9 +1,9 @@
-// services/user.service.ts  book 
+// services/user.service.ts book 
 import { UserDocument,UserModel } from '../model/user.model';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { AppError, NotFoundError, ValidationError, UnauthorizedError } from '../utils/errors';
 
+import { AppError, NotFoundError, ValidationError, UnauthorizedError } from '../utils/errors';
 
 interface CreateUserParams {
     username: string;
@@ -31,7 +31,7 @@ export class UserService {
     }
     
     public  generateAuthToken(userId: string, role: string): string {
-        return jwt.sign({ userId, role }, 'secret', { expiresIn: '1h' });
+        return jwt.sign({ userId, role }, 'secret', { expiresIn: '10h' });
     }
 
     public async createUser(params: CreateUserParams) {

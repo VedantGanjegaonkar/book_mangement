@@ -12,6 +12,5 @@ router.delete('/delete/:id',adminOnly,categoryController.deleteBook)
 router.put('/update/:id',adminOnly,categoryController.updateBook)
 router.get('/all',anyLogedIn,categoryController.getAllBooks)
 
-router.get('/get/:id',anyLogedIn,categoryController.getBookById)
 
 export default router;
