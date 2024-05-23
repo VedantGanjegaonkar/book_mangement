@@ -87,17 +87,62 @@ public async getAllBooksService({ page, limit, searchQuery, category, author }: 
 
     const pipeline: any[] = [];
 
+    pipeline.push({
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryDetails"
+        }
+      },
+      
+       {
+         $lookup: {
+           from: "authors",
+           localField: "author",
+           foreignField: "_id",
+           as: "authorDetails"
+         }
+       },
+       {
+         $project: {
+           "title":"$title",
+           "price":"$price",
+           "description":"$description",
+           "categoryName":"$categoryDetails.name",
+           "authorName":"$authorDetails.name"
+         }
+       })
+
+    
     if (searchQuery) {
         pipeline.push({
             $match: {
-                title: { $regex: new RegExp(searchQuery, 'i') }
+                $or:[
+                    {title: { $regex: new RegExp(searchQuery, 'i') }},
+                    { categoryName: { $regex: searchQuery, $options: 'i' } },
+                    { description: { $regex: searchQuery, $options: 'i' } },
+                    { authorName: { $regex: searchQuery, $options: 'i' } }
+                ]
+                
+                
             }
         });
     }
+
+
     if (category) {
+
+        const cateroryArray: any[] = [];
+    
+       cateroryArray.push(category)
+       console.log(cateroryArray);
+       
+
         pipeline.push({
             $match: {
-                category: new ObjectId(category)
+                categoryName: { $in: cateroryArray }
+                // category: new ObjectId(category)
             }
         });
     }
@@ -115,7 +160,7 @@ public async getAllBooksService({ page, limit, searchQuery, category, author }: 
         { $limit: limit }
     );
 
-    console.log(pipeline);
+    // console.log(pipeline);
     
     const book =await BookModel.aggregate(pipeline).exec();
 

@@ -7,6 +7,9 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.3"
   },
+  "scripts": {
+    "dev" : "nodemon index.ts"
+  },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
