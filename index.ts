@@ -28,10 +28,6 @@ app.use('/user',userRoute)
 
 
 
-
-
-
-
 // import { BookModel } from './model/book.model';
 
 

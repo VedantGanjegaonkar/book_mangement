@@ -24,7 +24,6 @@ export function adminOnly(req: CustomRequest, res: Response, next: NextFunction)
         return;
     }
 
-  
 
     req.user = user;
     console.log(user);
