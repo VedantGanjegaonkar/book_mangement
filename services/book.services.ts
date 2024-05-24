@@ -82,8 +82,8 @@ export class bookServices{
 
     // aggregation pipeline
  
-public async getAllBooksService({ page, limit, searchQuery, category, author }: BookQueryParams) {
-    const skip = (page - 1) * limit;
+public async getAllBooksService(params: BookQueryParams) {
+    const skip = (params.page - 1) * params.limit;
 
     const pipeline: any[] = [];
 
@@ -105,40 +105,67 @@ public async getAllBooksService({ page, limit, searchQuery, category, author }: 
          }
        },
        {
+        $unwind: {
+          path: "$authorDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+       {
          $project: {
-           "title":"$title",
-           "price":"$price",
-           "description":"$description",
+           title:1,
+           price:1,
+           description:1,
            "categoryName":"$categoryDetails.name",
            "authorName":"$authorDetails.name"
          }
-       })
+       },
+    )
 
+    const searchFields=[
+        "title",
+        "categoryName",
+        "description",
+        "authorName"
+    ]
+
+    let searchFilter: any = [];
+    let cateroryArray: any[] = [];
     
-    if (searchQuery) {
-        pipeline.push({
-            $match: {
-                $or:[
-                    {title: { $regex: new RegExp(searchQuery, 'i') }},
-                    { categoryName: { $regex: searchQuery, $options: 'i' } },
-                    { description: { $regex: searchQuery, $options: 'i' } },
-                    { authorName: { $regex: searchQuery, $options: 'i' } }
-                ]
-                
-                
-            }
-        });
+
+    if (params.searchQuery) {
+        searchFilter = searchFields.map((field) => ({
+            [field]: {
+              $regex: params.searchQuery,
+              $options: 'i',
+            },
+          }));
+
+          console.log("this is search array : ",searchFilter);
+          
+        // pipeline.push({
+        //     $match: {
+        //         "$or":searchFilter               
+        //     }
+        // });
     }
+//trying to make filter query
 
-
-    if (category) {
-
-        const cateroryArray: any[] = [];
+    const filterQuery={
+        $match:{
+            ...(searchFilter.length>0 && { $or: searchFilter })
+           
+        }
+    }
+    console.log("this is filter query :",filterQuery);
+    // { '$match': { '$or': [ [Object], [Object], [Object], [Object] ] } }
     
-       cateroryArray.push(category)
+   pipeline.push(filterQuery)
+
+    if (params.category) {
+
+       cateroryArray.push(params.category)
        console.log(cateroryArray);
        
-
         pipeline.push({
             $match: {
                 categoryName: { $in: cateroryArray }
@@ -146,28 +173,41 @@ public async getAllBooksService({ page, limit, searchQuery, category, author }: 
             }
         });
     }
-    if (author) {
+    if (params.author) {
         pipeline.push({
             $match: {
-                author: new ObjectId(author)
+                authorName:params.author
+                // author: new ObjectId(author)
             }
         });
     }
-
+    const book1 =await BookModel.aggregate(pipeline).exec();
 
     pipeline.push(
         { $skip: skip },
-        { $limit: limit }
+        { $limit: params.limit }
     );
 
     // console.log(pipeline);
     
     const book =await BookModel.aggregate(pipeline).exec();
 
-    // if(book.length==0){
-    //     throw new NotFoundError("no such book")
-    // }
-    return book 
+    const totalBooks= book1.length
+    const totalPages = Math.ceil(totalBooks / params.limit);
+    const currentPage = params.page
+
+    // console.log("total books :", totalBooks);
+    // console.log("total pages :", totalPages);
+    // console.log("currentPage :", currentPage);
+    
+    return {
+        book,
+      totalPages,
+      currentPage
+
+    }
+
+   
 };
 
 

@@ -2,6 +2,7 @@ import { Document, Schema, model } from 'mongoose';
 
 // Define the user interface
 interface UserDocument extends Document {
+    _id: Schema.Types.ObjectId;
     username: string;
     email: string;
     password: string;

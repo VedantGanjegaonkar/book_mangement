@@ -20,7 +20,7 @@ export class UserController {
           
             await this.userService.validatePassword(password, user.password);
             
-            const token = this.userService.generateAuthToken(user._id, user.role);
+            const token = this.userService.generateAuthToken(user._id.toString(), user.role);
 
             res.status(200).json({ message: 'Login successful', token });
         } catch (err: any) {
